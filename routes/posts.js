@@ -1,9 +1,15 @@
 const express = require('express')
 const router = express.Router()
+const axios = require('axios');
 const Post = require('../models/post')
 
-
-router.get('/', async(req,res) => {
+router.get('/:token',async (req,res)=>{
+	axios.get('http://localhost:3000/auth/isAuthenticated', {
+		headers: {
+			'x-auth-token': req.params.token
+		}})
+  		.then(async function (response) {
+			// User is authenticated
 
     try{
            const posts = await Post.find()
@@ -12,8 +18,23 @@ router.get('/', async(req,res) => {
         res.send('Error ' + err)
     }
 })
+.catch(function (error) {
+  // User is not authenticated
+  res.status(401).send('Error occurred !');
+})
+})
 
-router.post('/', async(req,res) => {
+
+
+
+
+router.post('/:token',async (req,res)=>{
+	axios.get('http://localhost:3000/auth/isAuthenticated', {
+		headers: {
+			'x-auth-token': req.params.token
+		}})
+  		.then(async function (response) {
+			// User is authenticated
     const post = new Post({
         title: req.body.title,
         content: req.body.content,
@@ -26,8 +47,20 @@ router.post('/', async(req,res) => {
         res.send('Error')
     }
 })
+.catch(function (error) {
+    // User is not authenticated
+    res.status(401).send('Error occurred !');
+  })
+  })
 
-router.get('/:id', async(req,res) => {
+
+  router.get('/:id/:token',async (req,res)=>{
+	axios.get('http://localhost:3000/auth/isAuthenticated', {
+		headers: {
+			'x-auth-token': req.params.token
+		}})
+  		.then(async function (response) {
+			// User is authenticated
     try{
            const post = await Post.findById(req.params.id)
            res.json(post)
@@ -35,11 +68,22 @@ router.get('/:id', async(req,res) => {
         res.send('Error ' + err)
     }
 })
+.catch(function (error) {
+    // User is not authenticated
+    res.status(401).send('Error occurred !');
+  })
+  })
 
 
 
+  router.patch('/:id/:token',async (req,res)=>{
+	axios.get('http://localhost:3000/auth/isAuthenticated', {
+		headers: {
+			'x-auth-token': req.params.token
+		}})
+  		.then(async function (response) {
+			// User is authenticated
 
-router.patch('/:id',async(req,res)=> {
     try{
         const post = await Post.findById(req.params.id)
         post.title = req.body.title
@@ -49,11 +93,21 @@ router.patch('/:id',async(req,res)=> {
     }catch(err){
         res.send('Error')
     }
-
 })
+.catch(function (error) {
+    // User is not authenticated
+    res.status(401).send('Error occurred !');
+  })
+  })
 
 
-router.delete('/:id',async(req,res)=> {
+  router.delete('/:id/:token',async (req,res)=>{
+	axios.get('http://localhost:3000/auth/isAuthenticated', {
+		headers: {
+			'x-auth-token': req.params.token
+		}})
+  		.then(async function (response) {
+			// User is authenticated
     const id = req.params.id;
 
     Post.findByIdAndRemove(id)
@@ -74,5 +128,11 @@ router.delete('/:id',async(req,res)=> {
         });
       });
   })
+  .catch(function (error) {
+    // User is not authenticated
+    res.status(401).send('Error occurred !');
+  })
+  })
+
 
 module.exports = router
